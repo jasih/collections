@@ -12,7 +12,9 @@ public class OrgChart {
     //  Add those fields here. Consider how you want to store the data, and which collection types to use to make
     //  implementing the other methods as easy as possible. There are several different ways to approach this problem, so
     //  experiment and don't be afraid to change how you're storing your data if it's not working out!
-
+	
+	private Set<Employee> orgChart = new HashSet<>();
+	
     /**
      * TODO: Implement this method
      *  <br><br>
@@ -24,7 +26,7 @@ public class OrgChart {
      *  return false. Otherwise:
      *  <br><br>
      *  If the given {@code Employee} has a {@code Manager} and that {@code Manager} is not part of the
-     *  {@code OrgChart} yet, add that {@code Manager} first and then add the given {@code Employee}, and return true.
+     *  {@code OrgChart} yet, add that {@code Manager} first and then add the given {@code Employee}, and return true.		// do this in a loop
      *  <br><br>
      *  If the given {@code Employee} has no {@code Manager}, but is a {@code Manager} itself, add it to the
      *  {@code OrgChart} and return true.
@@ -36,8 +38,32 @@ public class OrgChart {
      * @return true if the {@code Employee} was added successfully, false otherwise
      */
     public boolean addEmployee(Employee employee) {
-        throw new MissingImplementationException();
+    	
+    	if (orgChart.contains(employee) == true) {
+    		return false;
+    	} else {
+    		for (Employee e = employee; e != null; e = e.getManager()) {
+    			if (e.hasManager() == true && orgChart.contains(e.getManager()) == false) {
+    				orgChart.add(e.getManager());
+    				orgChart.add(e);
+    				return true;
+    			} else if (e.hasManager() == false && (e instanceof Manager) == true) {
+    				orgChart.add(e);
+    				return true;
+    			} else if (e.hasManager() == false && (e instanceof Manager) == false) {
+    				return false;
+    			
+    			}
+    	
+    		}
+    	
+    	}
+ 		
+    	return false;
+
     }
+    	
+    	
 
     /**
      * TODO: Implement this method
@@ -47,8 +73,16 @@ public class OrgChart {
      * @param employee the {@code Employee} to search for
      * @return true if the {@code Employee} has been added to the {@code OrgChart}, false otherwise
      */
+    
+    // Hint: orgChart.contains(employee)
+    
     public boolean hasEmployee(Employee employee) {
-        throw new MissingImplementationException();
+       
+    	if (orgChart.contains(employee) == true) {
+        	return true;
+        }
+        
+        return false;
     }
 
     /**
@@ -61,8 +95,11 @@ public class OrgChart {
      * @return all {@code Employee}s in the {@code OrgChart}, or an empty {@code Set} if no {@code Employee}s have
      *         been added to the {@code OrgChart}
      */
+
+    // this is given to me
+    
     public Set<Employee> getAllEmployees() {
-        throw new MissingImplementationException();
+        return new HashSet<>(orgChart);
     }
 
     /**
@@ -75,8 +112,19 @@ public class OrgChart {
      * @return all {@code Manager}s in the {@code OrgChart}, or an empty {@code Set} if no {@code Manager}s
      *         have been added to the {@code OrgChart}
      */
-    public Set<Manager> getAllManagers() {
-        throw new MissingImplementationException();
+   
+    public Set<Manager> getAllManagers() {											
+        
+    	Set<Manager> managerSet = new HashSet<>();									
+    	
+    	for (Employee e : orgChart) {												
+    																
+    		if (e instanceof Manager) {											
+    			managerSet.add((Manager) e);			
+    		}
+    	}
+    	
+    	return managerSet;														
     }
 
     /**
@@ -96,9 +144,25 @@ public class OrgChart {
      *         parent, or an empty set if the {@code Manager} is not present in the {@code OrgChart}
      *         or if there are no subordinates for the given {@code Manager}
      */
-    public Set<Employee> getDirectSubordinates(Manager manager) {
-        throw new MissingImplementationException();
+    public Set<Employee> getDirectSubordinates(Manager manager) {								
+        
+    	Set<Employee> directSubordinatesSet = new HashSet<>();									
+    	
+    	if (orgChart.contains(manager) == false) {												
+    		return directSubordinatesSet;														
+    	} else {
+    		for (Employee e : orgChart) {														
+    			if (e.getChainOfCommand().contains(manager)) {									
+    				directSubordinatesSet.add(e);												
+    			}
+    		}
+    	
+    		return directSubordinatesSet;	
+    	}
     }
+    	
+    														
+    
 
     /**
      * TODO: Implement this method
@@ -116,8 +180,24 @@ public class OrgChart {
      *         {@code OrgChart}, and the each value is a set of the direct subordinates of the
      *         associated {@code Manager}, or an empty map if the {@code OrgChart} is empty.
      */
+    
+    // Hint: need to make every Manager into a key, use getAllManagers()
+    // 1. loop through all the managers, 
+    // 2. outside the loop - create a new map, 
+    // 3. inside loop - say Map.put(Manager, getDirectSubordinates(Manager))
+    // 4. return new map
+    
+    // the value of the key needs to be the Set of employees, which represents its direct subordinates
+    // the direct subordinates should be the set of that manager key, use getDirectSubordinates()
+    
     public Map<Manager, Set<Employee>> getFullHierarchy() {
-        throw new MissingImplementationException();
+    	
+    	Map<Manager, Set<Employee>> hierarchy = new HashMap<>();
+    	
+    	for (Employee e : orgChart) {
+    		hierarchy.put(e.getManager(), (Set<Employee>) getDirectSubordinates(e.getManager()));
+    	}
+    	
+		return hierarchy;
     }
-
 }
